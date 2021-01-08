@@ -1,21 +1,25 @@
 CC=g++
-CFLAGS=-std=c++11 -g -Wall
-OFILES=main.o util.o OutputLayer.o InputLayer.o
+CXXFLAGS=-std=c++11 -g -Wall
+OFILES=main.o util.o Network.o SoftmaxLayer.o SigmoidLayer.o OutputLayer.o InputLayer.o NeuralError.o
 
 neuralNets: $(OFILES)
-	$(CC) $(FLAGS) $(OFILES) -o neuralNets
+	$(CC) $(CXXFLAGS) $(OFILES) -o neuralNets
 
 main.o: main.cpp OutputLayer.h InputLayer.h Network.h
-	$(CC) $(FLAGS) -c main.cpp
+
+Network.o: Network.cpp Network.h InputLayer.h OutputLayer.h
+
+SoftmaxLayer.o: SoftmaxLayer.cpp SoftmaxLayer.h OutputLayer.h InputLayer.h
+
+SigmoidLayer.o: SigmoidLayer.cpp SigmoidLayer.h OutputLayer.h InputLayer.h
 
 OutputLayer.o: OutputLayer.cpp OutputLayer.h InputLayer.h
-	$(CC) $(CFLAGS) -c OutputLayer.cpp
 
 InputLayer.o: InputLayer.cpp InputLayer.h
-	$(CC) $(CFLAGS) -c InputLayer.cpp
+
+NeuralError.o: NeuralError.cpp NeuralError.h
 
 util.o: util.cpp util.h
-	$(CC) $(CFLAGS) -c util.cpp
 
 
 run: neuralNets
@@ -28,3 +32,5 @@ clean:
 valgrind: neuralNets
 	valgrind ./neuralNets
 
+gdb: neuralNets
+	gdb ./neuralNets

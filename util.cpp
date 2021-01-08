@@ -5,6 +5,9 @@
 
 #include "util.h"
 #include <cmath>
+#include <cstdlib>
+#include <iostream>
+
 
 double sigmoid(double x) {
 	return 1.0 / (1.0 + exp(-x));
@@ -24,27 +27,78 @@ double sigOutToDeriv(double y) {
 	return y * (1.0 - y);
 };
 
-// same stuff but for floats instead of doubles
-float sigmoidFloat(float x) {
+// same stuff but for doubles instead of doubles
+double sigmoidFloat(double x) {
 	return 1.0f / (1.0f + expf(-x));
 };
 
-float sigDerivFloat(float x) {
-	float expNegX = expf(-x);
+double sigDerivFloat(double x) {
+	double expNegX = expf(-x);
 	return expNegX / (1.0f + expNegX*(2.0f + expNegX));
 };
 
-float sigOutToDerivFloat(float y) {
+double sigOutToDerivFloat(double y) {
 	return y * (1.0f - y);
 };
 
 // The order of "answer" and "expected" is irrelevant
-float squareDistance(float* answer, float* expected, int count) {
-	float dist = 0;
+double squareDistance(double* answer, double* expected, int count) {
+	double dist = 0;
 	for (int i = 0; i < count; i++) {
-		float offset = answer[i] - expected[i];
+		double offset = answer[i] - expected[i];
 		dist += offset * offset;
 	}
 	return dist;
 };
 
+
+// free the arrays of pointers
+void freeMetaArray(double** metaArray, int numArrays) {
+	for (int i = 0; i < numArrays; i++) {
+		delete[] metaArray[i];
+		metaArray[i] = nullptr;
+	}
+	delete[] metaArray;
+};
+
+
+double randDouble(double min, double max) {
+	// (max - min) * t + min, where 0 <= t <= 1
+	return (max - min) * ((double)rand() / (double)RAND_MAX) + min;
+};
+
+
+void fillBinary(int number, double* startPointer, int numBits) {
+	for (int i = 0; i < numBits; i++) {
+		// put the 1's bit
+		startPointer[i] = (double)(number & 1);
+		// and then discard that bit with a right-shift
+		number >>= 1;
+	}
+};
+
+// 0 to 1/3 is zero, 2/3 to 1 is one, in the middle is always wrong
+int checkBinary(int target, double* startPointer, int numBits) {
+	int wrong = 0;
+	for (int i = 0; i < numBits; i++) {
+		double value = startPointer[i];
+		int bit = (target >> i) & 1;
+		// if (low and 0) or (high and 1)
+		if ( !(value <= 1.0/3.0 && bit == 0) && !(value >= 2.0/3.0 && bit == 1) ) {
+			wrong++;
+		}
+	}
+	return wrong;
+};
+
+
+void printActivation(double x) {
+	if (x < 0.334) {
+		std::cout << RED;
+	} else if (x > 0.666) {
+		std::cout << GREEN;
+	} else {
+		std::cout << YELLOW;
+	}
+	std::cout << x << BLACK;
+};

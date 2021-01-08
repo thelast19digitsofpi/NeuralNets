@@ -17,18 +17,23 @@ protected:
 	InputLayer* head;
 	OutputLayer* tail;
 public:
-	Network(InputLayer);
+	Network(InputLayer*);
 	~Network();
 	
 	// the network complains if you feed an input of the wrong dimensions
 	// it's polite to have a way to get the correct dimensions then
 	int getInputSize();
+	int getNumLayers();
 	
 	// Feed forward.
-	float* evaluate(float*);
+	double** feedForward(double*);
+	void freeFeedForward(double**);
 	
-	// Back propagation!
-	float* adjustBiases(float**, int exampleCount);
+	// for testing output of feedForward
+	void printOutput(double**, bool);
+	
+	// look at that progression of indirection
+	void update(double** activationList, double*, double);
 };
 
 
